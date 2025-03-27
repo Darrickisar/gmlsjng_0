@@ -2,9 +2,9 @@
 import { getData, saveData } from './_data';
 
 export default async function handler(req, res) {
-  if(req.method === 'POST'){
+  if (req.method === 'POST') {
     const { type } = req.body;
-    if(!['candle', 'flower', 'incense'].includes(type)){
+    if (!['candle', 'flower', 'incense'].includes(type)) {
       return res.status(400).json({ error: '计数器类型错误' });
     }
     const data = await getData();
