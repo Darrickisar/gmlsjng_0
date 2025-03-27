@@ -13,5 +13,5 @@ export async function getData() {
 }
 
 export async function saveData(data) {
-  await putBlob(DATA_KEY, data, process.env.BLOB_READ_WRITE_TOKEN);
+  await putBlob(DATA_KEY, data,"vercel_blob_rw_XUNFJUgwGuo8v8MC_ETEualt4YVHQJOGCiI9N53Qdhkqj2G");
 }
