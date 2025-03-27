@@ -134,8 +134,8 @@
 <body>
   <div class="memorial-container">
     <img class="inserted-image" 
-      src="https://www.helloimg.com/i/2025/03/26/67e4192275ee1.png" 
-      alt="革命烈士纪念馆主图">
+         src="https://www.helloimg.com/i/2025/03/26/67e4192275ee1.png" 
+         alt="革命烈士纪念馆主图">
     
     <div class="header-banner"></div>
     <h1 class="title">革命烈士永垂不朽</h1>
@@ -201,11 +201,11 @@
       const musicIconEl = document.getElementById('musicIcon');
       const bgMusic = document.getElementById('bgMusic');
 
-      // 初始化加载后端数据（计数和留言）
+      // 从后端加载数据（计数和留言）
       const loadData = async () => {
         try {
           const res = await fetch('/api/data');
-          if(res.ok){
+          if (res.ok) {
             const data = await res.json();
             candleEl.textContent = data.candleCount;
             flowerEl.textContent = data.flowerCount;
@@ -243,18 +243,16 @@
             },
             body: JSON.stringify({ type })
           });
-          if(res.ok){
+          if (res.ok) {
             const result = await res.json();
-            // 更新对应计数的显示
-            if(type === 'candle'){
+            if (type === 'candle') {
               candleEl.textContent = result.newCount;
-            } else if(type === 'flower'){
+            } else if (type === 'flower') {
               flowerEl.textContent = result.newCount;
-            } else if(type === 'incense'){
+            } else if (type === 'incense') {
               incenseEl.textContent = result.newCount;
             }
             createEffect(symbol);
-            // 添加按钮点击动画反馈
             const btn = document.getElementById(`btn${type.charAt(0).toUpperCase() + type.slice(1)}`);
             btn.style.transform = 'scale(1.1)';
             setTimeout(() => { btn.style.transform = 'scale(1)'; }, 200);
@@ -272,7 +270,7 @@
       // 发送留言事件
       btnSendMessage.addEventListener('click', async () => {
         const message = messageInputEl.value.trim();
-        if(message){
+        if (message) {
           try {
             const res = await fetch('/api/message', {
               method: 'POST',
@@ -281,7 +279,7 @@
               },
               body: JSON.stringify({ message })
             });
-            if(res.ok){
+            if (res.ok) {
               const result = await res.json();
               updateMessageList(result.messages);
               messageInputEl.value = '';
@@ -294,7 +292,7 @@
 
       // 音乐控制
       musicControlEl.addEventListener('click', () => {
-        if(bgMusic.paused){
+        if (bgMusic.paused) {
           bgMusic.play();
           musicIconEl.textContent = '⏸️';
         } else {
