@@ -132,10 +132,11 @@
   </style>
 </head>
 <body>
+  <!-- 修正嵌套容器问题 -->
   <div class="memorial-container">
     <img class="inserted-image" 
-         src="https://www.helloimg.com/i/2025/03/26/67e4192275ee1.png" 
-         alt="革命烈士纪念馆主图">
+     src="https://www.helloimg.com/i/2025/03/26/67e4192275ee1.png" 
+     alt="革命烈士纪念馆主图">
     
     <div class="header-banner"></div>
     <h1 class="title">革命烈士永垂不朽</h1>
@@ -170,17 +171,48 @@
       您的浏览器不支持视频播放。
     </video>
 
-  
-    <div class="music-control" id="musicControl">
-      <span id="musicIcon">▶️</span>
-      <audio id="bgMusic" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2023/03/25/audio_ebd8a4d9b6.mp3" type="audio/mpeg">
-      </audio>
+    <div class="message-box">
+      <ul id="message-list"></ul>
+      <input type="text" id="message-input" placeholder="留下您的缅怀之言...">
+      <button id="send-message">发送留言</button>
     </div>
-  </div>
+
+    <audio id="bgMusic" loop>
+      <source src="your-music-file.mp3" type="audio/mpeg">
+      您的浏览器不支持音频播放。
+    </audio>
+    <div class="music-control" id="musicControl">
+      ▶️
+    </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // 数据存储配置
+      const storageKeys = {
+        messages: 'memorialMessages',
+        candle: 'candleCount',
+        flower: 'flowerCount',
+        incense: 'incenseCount'
+      };
+
+      // 初始化默认数据
+      const defaultData = {
+        messages: [],
+        candleCount: 0,
+        flowerCount: 0,
+        incenseCount: 0
+      };
+
+      // 加载本地数据
+      const loadData = () => ({
+        messages: JSON.parse(localStorage.getItem(storageKeys.messages)) || defaultData.messages,
+        candleCount: parseInt(localStorage.getItem(storageKeys.candle)) || defaultData.candleCount,
+        flowerCount: parseInt(localStorage.getItem(storageKeys.flower)) || defaultData.flowerCount,
+        incenseCount: parseInt(localStorage.getItem(storageKeys.incense)) || defaultData.incenseCount
+      });
+
+      let data = loadData();
+
       // DOM元素引用
       const candleEl = document.getElementById('candleCount');
       const flowerEl = document.getElementById('flowerCount');
@@ -192,31 +224,28 @@
       const btnIncense = document.getElementById('btnIncense');
       const btnSendMessage = document.getElementById('send-message');
       const musicControlEl = document.getElementById('musicControl');
-      const musicIconEl = document.getElementById('musicIcon');
       const bgMusic = document.getElementById('bgMusic');
 
-      // 从后端加载数据（计数和留言）
-      const loadData = async () => {
-        try {
-          const res = await fetch('/api/data');
-          if (res.ok) {
-            const data = await res.json();
-            candleEl.textContent = data.candleCount;
-            flowerEl.textContent = data.flowerCount;
-            incenseEl.textContent = data.incenseCount;
-            updateMessageList(data.messages);
-          }
-        } catch (err) {
-          console.error('加载数据失败', err);
-        }
+      // 更新本地存储
+      const updateLocalStorage = (key, value) => {
+        localStorage.setItem(key, value);
       };
 
-      // 更新留言列表显示
-      const updateMessageList = (messages) => {
-        messageListEl.innerHTML = messages.map(msg => `<li>${msg}</li>`).join('');
+      // 更新计数器显示
+      const updateCounters = () => {
+        candleEl.textContent = data.candleCount;
+        flowerEl.textContent = data.flowerCount;
+        incenseEl.textContent = data.incenseCount;
       };
 
-      // 添加视觉反馈效果
+      // 更新留言列表
+      const updateMessageList = () => {
+        messageListEl.innerHTML = data.messages.map(msg => 
+          `<li>${msg}</li>`
+        ).join('');
+      };
+
+      // 添加互动效果
       const createEffect = (symbol) => {
         const effectEl = document.createElement('div');
         effectEl.style.position = 'fixed';
@@ -224,63 +253,41 @@
         effectEl.style.animation = 'floatUp 1s ease-out';
         effectEl.textContent = symbol;
         document.body.appendChild(effectEl);
-        setTimeout(() => { effectEl.remove(); }, 1000);
+
+        // 动画结束后移除元素
+        setTimeout(() => {
+          effectEl.remove();
+        }, 1000);
       };
 
-      // 通用请求更新计数器
-      const updateCounter = async (type, symbol) => {
-        try {
-          const res = await fetch('/api/counter', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ type })
-          });
-          if (res.ok) {
-            const result = await res.json();
-            if (type === 'candle') {
-              candleEl.textContent = result.newCount;
-            } else if (type === 'flower') {
-              flowerEl.textContent = result.newCount;
-            } else if (type === 'incense') {
-              incenseEl.textContent = result.newCount;
-            }
-            createEffect(symbol);
-            const btn = document.getElementById(`btn${type.charAt(0).toUpperCase() + type.slice(1)}`);
-            btn.style.transform = 'scale(1.1)';
-            setTimeout(() => { btn.style.transform = 'scale(1)'; }, 200);
-          }
-        } catch (err) {
-          console.error('更新计数器失败', err);
-        }
+      // 核心累加功能
+      const addItem = (type, symbol, incrementValue = 1) => {
+        data[`${type}Count`] += incrementValue;
+        updateLocalStorage(storageKeys[type], data[`${type}Count`]);
+        updateCounters();
+        createEffect(symbol);
+        
+        // 添加视觉反馈
+        const btn = document.getElementById(`btn${type.charAt(0).toUpperCase() + type.slice(1)}`);
+        btn.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+          btn.style.transform = 'scale(1)';
+        }, 200);
       };
 
-      // 绑定计数按钮事件
-      btnCandle.addEventListener('click', () => updateCounter('candle', '🕯️'));
-      btnFlower.addEventListener('click', () => updateCounter('flower', '🌸'));
-      btnIncense.addEventListener('click', () => updateCounter('incense', '🎐'));
+      // 事件绑定
+      btnCandle.addEventListener('click', () => addItem('candle', '🕯️'));
+      btnFlower.addEventListener('click', () => addItem('flower', '🌸'));
+      btnIncense.addEventListener('click', () => addItem('incense', '🎐'));
 
-      // 发送留言事件
-      btnSendMessage.addEventListener('click', async () => {
+      // 留言功能
+      btnSendMessage.addEventListener('click', () => {
         const message = messageInputEl.value.trim();
         if (message) {
-          try {
-            const res = await fetch('/api/message', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ message })
-            });
-            if (res.ok) {
-              const result = await res.json();
-              updateMessageList(result.messages);
-              messageInputEl.value = '';
-            }
-          } catch (err) {
-            console.error('发送留言失败', err);
-          }
+          data.messages.push(message);
+          localStorage.setItem(storageKeys.messages, JSON.stringify(data.messages));
+          updateMessageList();
+          messageInputEl.value = '';
         }
       });
 
@@ -288,15 +295,16 @@
       musicControlEl.addEventListener('click', () => {
         if (bgMusic.paused) {
           bgMusic.play();
-          musicIconEl.textContent = '⏸️';
+          musicControlEl.textContent = '⏸️';
         } else {
           bgMusic.pause();
-          musicIconEl.textContent = '▶️';
+          musicControlEl.textContent = '▶️';
         }
       });
 
-      // 初始加载数据
-      loadData();
+      // 初始化显示
+      updateCounters();
+      updateMessageList();
 
       // 添加动画样式
       const style = document.createElement('style');
@@ -311,3 +319,6 @@
   </script>
 </body>
 </html>
+
+
+
