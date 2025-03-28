@@ -149,17 +149,17 @@
     <div class="counters">
       <div class="counter">
         <div>点亮蜡烛</div>
-        <div class="counter-number" id="candleCount">0</div>
+        <div class="counter-number" id="candleCount">459</div>
         <div>支</div>
       </div>
       <div class="counter">
         <div>敬献鲜花</div>
-        <div class="counter-number" id="flowerCount">0</div>
+        <div class="counter-number" id="flowerCount">492</div>
         <div>朵</div>
       </div>
       <div class="counter">
         <div>电子香炉</div>
-        <div class="counter-number" id="incenseCount">0</div>
+        <div class="counter-number" id="incenseCount">459</div>
         <div>柱</div>
       </div>
     </div>
@@ -176,7 +176,6 @@
       您的浏览器不支持视频播放。
     </video>
 
-
     <audio id="bgMusic" loop>
       <source src="your-music-file.mp3" type="audio/mpeg">
       您的浏览器不支持音频播放。
@@ -185,125 +184,149 @@
       ▶️
     </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // 数据存储配置
-      const storageKeys = {
-        messages: 'memorialMessages',
-        candle: 'candleCount',
-        flower: 'flowerCount',
-        incense: 'incenseCount'
-      };
+    <div class="message-box">
+      <ul id="message-list"></ul>
+      <input type="text" id="message-input" placeholder="留下您的祝福...">
+      <button id="send-message">发送消息</button>
+    </div>
 
-      // 初始化默认数据
-      const defaultData = {
-        messages: [],
-        candleCount: 459,
-        flowerCount: 492,
-        incenseCount: 459
-      };
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // 数据存储配置
+        const storageKeys = {
+          messages: 'memorialMessages',
+          candle: 'candleCount',
+          flower: 'flowerCount',
+          incense: 'incenseCount'
+        };
 
-      // 加载本地数据
-      const loadData = () => ({
-        messages: JSON.parse(localStorage.getItem(storageKeys.messages)) || defaultData.messages,
-        candleCount: parseInt(localStorage.getItem(storageKeys.candle)) || defaultData.candleCount,
-        flowerCount: parseInt(localStorage.getItem(storageKeys.flower)) || defaultData.flowerCount,
-        incenseCount: parseInt(localStorage.getItem(storageKeys.incense)) || defaultData.incenseCount
-      });
+        // 初始化默认数据
+        const defaultData = {
+          messages: [],
+          candleCount: 459,
+          flowerCount: 492,
+          incenseCount: 459
+        };
 
-      let data = loadData();
+        // 加载本地数据
+        const loadData = () => ({
+          messages: JSON.parse(localStorage.getItem(storageKeys.messages)) || defaultData.messages,
+          candleCount: parseInt(localStorage.getItem(storageKeys.candle)) || defaultData.candleCount,
+          flowerCount: parseInt(localStorage.getItem(storageKeys.flower)) || defaultData.flowerCount,
+          incenseCount: parseInt(localStorage.getItem(storageKeys.incense)) || defaultData.incenseCount
+        });
 
-      // DOM元素引用
-      const candleEl = document.getElementById('candleCount');
-      const flowerEl = document.getElementById('flowerCount');
-      const incenseEl = document.getElementById('incenseCount');
-      const messageListEl = document.getElementById('message-list');
-      const messageInputEl = document.getElementById('message-input');
-      const btnCandle = document.getElementById('btnCandle');
-      const btnFlower = document.getElementById('btnFlower');
-      const btnIncense = document.getElementById('btnIncense');
-      const btnSendMessage = document.getElementById('send-message');
-      const musicControlEl = document.getElementById('musicControl');
-      const bgMusic = document.getElementById('bgMusic');
+        let data = loadData();
 
-      // 更新本地存储
-      const updateLocalStorage = (key, value) => {
-        localStorage.setItem(key, value);
-      };
+        // DOM元素引用
+        const candleEl = document.getElementById('candleCount');
+        const flowerEl = document.getElementById('flowerCount');
+        const incenseEl = document.getElementById('incenseCount');
+        const messageListEl = document.getElementById('message-list');
+        const messageInputEl = document.getElementById('message-input');
+        const btnCandle = document.getElementById('btnCandle');
+        const btnFlower = document.getElementById('btnFlower');
+        const btnIncense = document.getElementById('btnIncense');
+        const btnSendMessage = document.getElementById('send-message');
+        const musicControlEl = document.getElementById('musicControl');
+        const bgMusic = document.getElementById('bgMusic');
 
-      // 更新计数器显示
-      const updateCounters = () => {
-        candleEl.textContent = data.candleCount;
-        flowerEl.textContent = data.flowerCount;
-        incenseEl.textContent = data.incenseCount;
-      };
+        // 更新本地存储
+        const updateLocalStorage = (key, value) => {
+          localStorage.setItem(key, value);
+        };
 
+        // 更新计数器显示
+        const updateCounters = () => {
+          candleEl.textContent = data.candleCount;
+          flowerEl.textContent = data.flowerCount;
+          incenseEl.textContent = data.incenseCount;
+        };
 
+        // 更新留言列表
+        const updateMessageList = () => {
+          messageListEl.innerHTML = '';
+          data.messages.forEach(message => {
+            const li = document.createElement('li');
+            li.textContent = message;
+            messageListEl.appendChild(li);
+          });
+        };
 
-      // 添加互动效果
-      const createEffect = (symbol) => {
-        const effectEl = document.createElement('div');
-        effectEl.style.position = 'fixed';
-        effectEl.style.fontSize = '24px';
-        effectEl.style.animation = 'floatUp 1s ease-out';
-        effectEl.textContent = symbol;
-        document.body.appendChild(effectEl);
+        // 添加互动效果
+        const createEffect = (symbol) => {
+          const effectEl = document.createElement('div');
+          effectEl.style.position = 'fixed';
+          effectEl.style.fontSize = '24px';
+          effectEl.style.animation = 'floatUp 1s ease-out';
+          effectEl.textContent = symbol;
+          document.body.appendChild(effectEl);
 
-        // 动画结束后移除元素
-        setTimeout(() => {
-          effectEl.remove();
-        }, 1000);
-      };
+          // 动画结束后移除元素
+          setTimeout(() => {
+            effectEl.remove();
+          }, 1000);
+        };
 
-      // 核心累加功能
-      const addItem = (type, symbol, incrementValue = 1) => {
-        data[`${type}Count`] += incrementValue;
-        updateLocalStorage(storageKeys[type], data[`${type}Count`]);
+        // 核心累加功能
+        const addItem = (type, symbol, incrementValue = 1) => {
+          data[`${type}Count`] += incrementValue;
+          updateLocalStorage(storageKeys[type], data[`${type}Count`]);
+          updateCounters();
+          createEffect(symbol);
+          
+          // 添加视觉反馈
+          const btn = document.getElementById(`btn${type.charAt(0).toUpperCase() + type.slice(1)}`);
+          btn.style.transform = 'scale(1.1)';
+          setTimeout(() => {
+            btn.style.transform = 'scale(1)';
+          }, 200);
+        };
+
+        // 发送消息功能
+        btnSendMessage.addEventListener('click', () => {
+          const message = messageInputEl.value.trim();
+          if (message) {
+            data.messages.push(message);
+            updateLocalStorage(storageKeys.messages, JSON.stringify(data.messages));
+            updateMessageList();
+            messageInputEl.value = '';
+          }
+        });
+
+        // 事件绑定
+        btnCandle.addEventListener('click', () => addItem('candle', '🕯️'));
+        btnFlower.addEventListener('click', () => addItem('flower', '🌸'));
+        btnIncense.addEventListener('click', () => addItem('incense', '🎐'));
+
+        // 音乐控制
+        musicControlEl.addEventListener('click', () => {
+          if (bgMusic.paused) {
+            bgMusic.play();
+            musicControlEl.textContent = '⏸️';
+          } else {
+            bgMusic.pause();
+            musicControlEl.textContent = '▶️';
+          }
+        });
+
+        // 初始化显示
         updateCounters();
-        createEffect(symbol);
-        
-        // 添加视觉反馈
-        const btn = document.getElementById(`btn${type.charAt(0).toUpperCase() + type.slice(1)}`);
-        btn.style.transform = 'scale(1.1)';
-        setTimeout(() => {
-          btn.style.transform = 'scale(1)';
-        }, 200);
-      };
+        updateMessageList();
 
-      // 事件绑定
-      btnCandle.addEventListener('click', () => addItem('candle', '🕯️'));
-      btnFlower.addEventListener('click', () => addItem('flower', '🌸'));
-      btnIncense.addEventListener('click', () => addItem('incense', '🎐'));
-
-  
-
-      // 音乐控制
-      musicControlEl.addEventListener('click', () => {
-        if (bgMusic.paused) {
-          bgMusic.play();
-          musicControlEl.textContent = '⏸️';
-        } else {
-          bgMusic.pause();
-          musicControlEl.textContent = '▶️';
-        }
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+          }
+        `;
+        document.head.appendChild(style);
       });
-
-      // 初始化显示
-      updateCounters();
-      updateMessageList();
-
-      // 添加动画样式
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes floatUp {
-          0% { transform: translateY(0); opacity: 1; }
-          100% { transform: translateY(-100px); opacity: 0; }
-        }
-      `;
-      document.head.appendChild(style);
-    });
-  </script>
-    <div class="footer">
+    </script>
+  </div>
+  <div class="footer">
     湄洲湾职业技术学院信息工程系出品
   </div>
 </body>
