@@ -102,32 +102,18 @@
       margin-top: 10px; /* 减少顶部外边距 */
       filter: grayscale(100%);
     }
-    #message-list {
-      list-style-type: none;
-      padding: 0;
-    }
-    #message-list li {
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-    #message-input {
-      width: calc(100% - 22px);
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    #send-message {
+    #play-video-btn {
+      display: block;
+      margin: 20px auto;
       padding: 10px 20px;
       background-color: var(--primary-color);
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      font-size: 16px;
     }
-    #send-message:hover {
+    #play-video-btn:hover {
       background-color: #888;
     }
     .footer {
@@ -182,7 +168,7 @@
       <button class="action-btn" id="btnIncense">🎐 电子香炉</button>
     </div>
 
-    <video class="inserted-video" controls autoplay loop muted>
+    <video class="inserted-video" controls autoplay loop id="memorialVideo">
       <source src="https://ik.imagekit.io/RedGhst1818/Revolutionary%20Martyrs'%20Memorial.mp4?updatedAt=1743003548987" 
               type="video/mp4">
       您的浏览器不支持视频播放。
@@ -195,6 +181,8 @@
     <div class="music-control" id="musicControl">
       ▶️
     </div>
+
+    <button id="play-video-btn">点击此处播放视频</button>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
@@ -236,6 +224,8 @@
         const btnSendMessage = document.getElementById('send-message');
         const musicControlEl = document.getElementById('musicControl');
         const bgMusic = document.getElementById('bgMusic');
+        const memorialVideo = document.getElementById('memorialVideo');
+        const playVideoBtn = document.getElementById('play-video-btn');
 
         // 更新本地存储
         const updateLocalStorage = (key, value) => {
@@ -293,6 +283,13 @@
             bgMusic.pause();
             musicControlEl.textContent = '▶️';
           }
+        });
+
+        // 视频播放控制
+        playVideoBtn.addEventListener('click', () => {
+          memorialVideo.muted = false;
+          memorialVideo.play();
+          playVideoBtn.style.display = 'none'; // 隐藏按钮
         });
 
         // 初始化显示
