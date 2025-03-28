@@ -26,7 +26,7 @@
     .title {
       text-align: center;
       color: var(--primary-color);
-      margin: 20px 0 10px; /* 减少底部外边距 */
+      margin: 20px 0;
       font-size: 2em;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     }
@@ -73,21 +73,7 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-    .music-control {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--primary-color);
-      color: white;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
+
     .message-box {
       border-top: 2px solid var(--primary-color);
       padding-top: 25px;
@@ -99,21 +85,35 @@
     }
     .inserted-video {
       width: 100%;
-      margin-top: 10px; /* 减少顶部外边距 */
+      margin-top: 20px;
       filter: grayscale(100%);
     }
-    #play-video-btn {
-      display: block;
-      margin: 20px auto;
+    #message-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    #message-list li {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    #message-input {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #send-message {
       padding: 10px 20px;
       background-color: var(--primary-color);
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 16px;
     }
-    #play-video-btn:hover {
+    #send-message:hover {
       background-color: #888;
     }
     .footer {
@@ -136,7 +136,6 @@
   </style>
 </head>
 <body>
-  <!-- 修正嵌套容器问题 -->
   <div class="memorial-container">
     <img class="inserted-image" 
      src="https://www.helloimg.com/i/2025/03/26/67e4192275ee1.png" 
@@ -168,7 +167,7 @@
       <button class="action-btn" id="btnIncense">🎐 电子香炉</button>
     </div>
 
-    <video class="inserted-video" controls autoplay loop id="memorialVideo">
+    <video class="inserted-video" controls autoplay loop muted>
       <source src="https://ik.imagekit.io/RedGhst1818/Revolutionary%20Martyrs'%20Memorial.mp4?updatedAt=1743003548987" 
               type="video/mp4">
       您的浏览器不支持视频播放。
@@ -178,15 +177,10 @@
       <source src="your-music-file.mp3" type="audio/mpeg">
       您的浏览器不支持音频播放。
     </audio>
-    <div class="music-control" id="musicControl">
-      ▶️
-    </div>
 
-    <button id="play-video-btn">点击此处播放视频</button>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
-        // 数据存储配置
         const storageKeys = {
           messages: 'memorialMessages',
           candle: 'candleCount',
@@ -194,7 +188,6 @@
           incense: 'incenseCount'
         };
 
-        // 初始化默认数据
         const defaultData = {
           messages: [],
           candleCount: 459,
@@ -202,7 +195,6 @@
           incenseCount: 459
         };
 
-        // 加载本地数据
         const loadData = () => ({
           messages: JSON.parse(localStorage.getItem(storageKeys.messages)) || defaultData.messages,
           candleCount: parseInt(localStorage.getItem(storageKeys.candle)) || defaultData.candleCount,
@@ -212,7 +204,6 @@
 
         let data = loadData();
 
-        // DOM元素引用
         const candleEl = document.getElementById('candleCount');
         const flowerEl = document.getElementById('flowerCount');
         const incenseEl = document.getElementById('incenseCount');
@@ -224,22 +215,17 @@
         const btnSendMessage = document.getElementById('send-message');
         const musicControlEl = document.getElementById('musicControl');
         const bgMusic = document.getElementById('bgMusic');
-        const memorialVideo = document.getElementById('memorialVideo');
-        const playVideoBtn = document.getElementById('play-video-btn');
 
-        // 更新本地存储
         const updateLocalStorage = (key, value) => {
           localStorage.setItem(key, value);
         };
 
-        // 更新计数器显示
         const updateCounters = () => {
           candleEl.textContent = data.candleCount;
           flowerEl.textContent = data.flowerCount;
           incenseEl.textContent = data.incenseCount;
         };
 
-        // 添加互动效果
         const createEffect = (symbol) => {
           const effectEl = document.createElement('div');
           effectEl.style.position = 'fixed';
@@ -248,20 +234,17 @@
           effectEl.textContent = symbol;
           document.body.appendChild(effectEl);
 
-          // 动画结束后移除元素
           setTimeout(() => {
             effectEl.remove();
           }, 1000);
         };
 
-        // 核心累加功能
         const addItem = (type, symbol, incrementValue = 1) => {
           data[`${type}Count`] += incrementValue;
           updateLocalStorage(storageKeys[type], data[`${type}Count`]);
           updateCounters();
           createEffect(symbol);
           
-          // 添加视觉反馈
           const btn = document.getElementById(`btn${type.charAt(0).toUpperCase() + type.slice(1)}`);
           btn.style.transform = 'scale(1.1)';
           setTimeout(() => {
@@ -269,34 +252,14 @@
           }, 200);
         };
 
-        // 事件绑定
         btnCandle.addEventListener('click', () => addItem('candle', '🕯️'));
         btnFlower.addEventListener('click', () => addItem('flower', '🌸'));
         btnIncense.addEventListener('click', () => addItem('incense', '🎐'));
 
-        // 音乐控制
-        musicControlEl.addEventListener('click', () => {
-          if (bgMusic.paused) {
-            bgMusic.play();
-            musicControlEl.textContent = '⏸️';
-          } else {
-            bgMusic.pause();
-            musicControlEl.textContent = '▶️';
-          }
-        });
-
-        // 视频播放控制
-        playVideoBtn.addEventListener('click', () => {
-          memorialVideo.muted = false;
-          memorialVideo.play();
-          playVideoBtn.style.display = 'none'; // 隐藏按钮
-        });
-
-        // 初始化显示
+        
         updateCounters();
         updateMessageList();
 
-        // 添加动画样式
         const style = document.createElement('style');
         style.textContent = `
           @keyframes floatUp {
