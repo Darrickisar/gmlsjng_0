@@ -73,6 +73,21 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
+    .music-control {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
     .message-box {
       border-top: 2px solid var(--primary-color);
       padding-top: 25px;
@@ -153,11 +168,21 @@
       <button class="action-btn" id="btnIncense">🎐 电子香炉</button>
     </div>
 
-    <video class="inserted-video" controls autoplay loop>
+    <video class="inserted-video" controls autoplay loop id="memorialVideo">
       <source src="https://ik.imagekit.io/RedGhst1818/Revolutionary%20Martyrs'%20Memorial.mp4?updatedAt=1743003548987" 
               type="video/mp4">
       您的浏览器不支持视频播放。
     </video>
+
+    <audio id="bgMusic" loop>
+      <source src="your-music-file.mp3" type="audio/mpeg">
+      您的浏览器不支持音频播放。
+    </audio>
+    <div class="music-control" id="musicControl">
+      ▶️
+    </div>
+
+    <button id="play-video-btn">点击此处播放视频</button>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
@@ -197,6 +222,10 @@
         const btnFlower = document.getElementById('btnFlower');
         const btnIncense = document.getElementById('btnIncense');
         const btnSendMessage = document.getElementById('send-message');
+        const musicControlEl = document.getElementById('musicControl');
+        const bgMusic = document.getElementById('bgMusic');
+        const memorialVideo = document.getElementById('memorialVideo');
+        const playVideoBtn = document.getElementById('play-video-btn');
 
         // 更新本地存储
         const updateLocalStorage = (key, value) => {
@@ -245,6 +274,15 @@
         btnFlower.addEventListener('click', () => addItem('flower', '🌸'));
         btnIncense.addEventListener('click', () => addItem('incense', '🎐'));
 
+        
+
+        // 视频播放控制
+        playVideoBtn.addEventListener('click', () => {
+          memorialVideo.muted = false;
+          memorialVideo.play();
+          playVideoBtn.style.display = 'none'; // 隐藏按钮
+        });
+
         // 初始化显示
         updateCounters();
         updateMessageList();
@@ -266,6 +304,3 @@
   </div>
 </body>
 </html>
-
-
-
