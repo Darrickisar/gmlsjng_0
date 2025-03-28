@@ -26,7 +26,7 @@
     .title {
       text-align: center;
       color: var(--primary-color);
-      margin: 20px 0 5px; 
+      margin: 20px 0 5px;
       font-size: 2em;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     }
@@ -68,10 +68,18 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      position: relative;
+      overflow: hidden;
     }
     .action-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 新增动画样式 */
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
     }
 
     .message-box {
@@ -85,7 +93,7 @@
     }
     .inserted-video {
       width: 100%;
-      margin-top: 5px; 
+      margin-top: 5px;
       filter: grayscale(100%);
     }
     #play-video-btn {
@@ -159,7 +167,6 @@
       您的浏览器不支持视频播放。
     </video>
 
-
     <button id="play-video-btn">点击此处播放视频</button>
 
     <script>
@@ -190,80 +197,92 @@
         const candleEl = document.getElementById('candleCount');
         const flowerEl = document.getElementById('flowerCount');
         const incenseEl = document.getElementById('incenseCount');
-        const messageListEl = document.getElementById('message-list');
-        const messageInputEl = document.getElementById('message-input');
         const btnCandle = document.getElementById('btnCandle');
         const btnFlower = document.getElementById('btnFlower');
         const btnIncense = document.getElementById('btnIncense');
-        const btnSendMessage = document.getElementById('send-message');
         const memorialVideo = document.getElementById('memorialVideo');
         const playVideoBtn = document.getElementById('play-video-btn');
 
+        // 更新本地存储
         const updateLocalStorage = (key, value) => {
           localStorage.setItem(key, value);
         };
 
+        // 更新计数器显示
         const updateCounters = () => {
           candleEl.textContent = data.candleCount;
           flowerEl.textContent = data.flowerCount;
           incenseEl.textContent = data.incenseCount;
         };
 
-        const createEffect = (symbol) => {
+        // 创建动画效果
+        const createEffect = (symbol, event) => {
           const effectEl = document.createElement('div');
           effectEl.style.position = 'fixed';
           effectEl.style.fontSize = '24px';
-          effectEl.style.animation = 'floatUp 1s ease-out';
+          effectEl.style.color = '#ff4444';
+          effectEl.style.pointerEvents = 'none';
+          effectEl.style.zIndex = '9999';
           effectEl.textContent = symbol;
+
+          // 计算按钮中心位置
+          const rect = event.target.getBoundingClientRect();
+          const x = rect.left + rect.width/2 - 12;
+          const y = rect.top + rect.height/2 - 12;
+          
+          effectEl.style.left = x + 'px';
+          effectEl.style.top = y + 'px';
+          effectEl.style.animation = 'floatUp 1.2s ease-out forwards';
+
           document.body.appendChild(effectEl);
 
+          // 自动移除元素
           setTimeout(() => {
             effectEl.remove();
-          }, 1000);
+          }, 1200);
         };
 
-        const addItem = (type, symbol, incrementValue = 1) => {
-          data[`${type}Count`] += incrementValue;
+        // 添加纪念物品
+        const addItem = (type, symbol, event) => {
+          data[`${type}Count`] += 1;
           updateLocalStorage(storageKeys[type], data[`${type}Count`]);
           updateCounters();
-          createEffect(symbol);
+          createEffect(symbol, event);
           
-          const btn = document.getElementById(`btn${type.charAt(0).toUpperCase() + type.slice(1)}`);
-          btn.style.transform = 'scale(1.1)';
+          // 按钮点击动效
+          const btn = event.target;
+          btn.style.transform = 'scale(0.95)';
           setTimeout(() => {
             btn.style.transform = 'scale(1)';
           }, 200);
         };
 
-        btnCandle.addEventListener('click', () => addItem('candle', '🕯️'));
-        btnFlower.addEventListener('click', () => addItem('flower', '🌸'));
-        btnIncense.addEventListener('click', () => addItem('incense', '🎐'));
+        // 事件监听
+        btnCandle.addEventListener('click', (e) => {
+          addItem('candle', '🕯️', e);
+        });
+        btnFlower.addEventListener('click', (e) => {
+          addItem('flower', '🌸', e);
+        });
+        btnIncense.addEventListener('click', (e) => {
+          addItem('incense', '🎐', e);
+        });
 
+        // 视频控制
         playVideoBtn.addEventListener('click', () => {
           memorialVideo.muted = false;
           memorialVideo.play();
           playVideoBtn.style.display = 'none';
         });
 
+        // 初始化
         updateCounters();
-        updateMessageList();
-
-        const style = document.createElement('style');
-        style.textContent = `
-          @keyframes floatUp {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-100px); opacity: 0; }
-          }
-        `;
-        document.head.appendChild(style);
       });
     </script>
+
     <div class="footer">
       湄洲湾职业技术学院信息工程系出品
     </div>
   </div>
 </body>
 </html>
-
-
-
