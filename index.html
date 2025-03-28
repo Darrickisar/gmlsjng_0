@@ -233,12 +233,7 @@
         incenseEl.textContent = data.incenseCount;
       };
 
-      // 更新留言列表
-      const updateMessageList = () => {
-        messageListEl.innerHTML = data.messages.map(msg => 
-          `<li>${msg}</li>`
-        ).join('');
-      };
+
 
       // 添加互动效果
       const createEffect = (symbol) => {
@@ -275,16 +270,7 @@
       btnFlower.addEventListener('click', () => addItem('flower', '🌸'));
       btnIncense.addEventListener('click', () => addItem('incense', '🎐'));
 
-      // 留言功能
-      btnSendMessage.addEventListener('click', () => {
-        const message = messageInputEl.value.trim();
-        if (message) {
-          data.messages.push(message);
-          localStorage.setItem(storageKeys.messages, JSON.stringify(data.messages));
-          updateMessageList();
-          messageInputEl.value = '';
-        }
-      });
+  
 
       // 音乐控制
       musicControlEl.addEventListener('click', () => {
